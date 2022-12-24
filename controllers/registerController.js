@@ -8,13 +8,17 @@ exports.registerPage = (req, res) => {
 
 exports.registerUser = async (req, res) => {
     // Validate the user's input
-    if (!req.body.name || !req.body.email || !req.body.password) {
+    if (!req.body.name || !req.body.email || !req.body.password || !req.body.confirm_password) {
         // If any of the required fields are missing, return an error
-        return res.status(400).send({ error: 'Name, email, and password are required' });
+        return res.status(400).send({ error: 'Name, email, password, and confirm password are required' });
     }
     if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(req.body.email)) {
         // If the email is not in a valid format, return an error
         return res.status(400).send({ error: 'Invalid email' });
+    }
+    if (req.body.password !== req.body.confirm_password) {
+        // If the passwords don't match, return an error
+        return res.status(400).send({ error: 'Passwords do not match' });
     }
 
     // Check if a user with the same email already exists
