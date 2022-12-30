@@ -40,9 +40,8 @@ exports.registerUser = async (req, res) => {
         };
         // add the user to the users array
         users.push(user);
-
-        // send a response to the client indicating that the registration was successful
-        res.send({ message: 'Registration successful' });
+        // Redirect the user to the login page
+        res.redirect('/login');
     } catch (error) {
         // there was an error, send an error response to the client
         res.status(500).send({ error: 'Error registering user' });
