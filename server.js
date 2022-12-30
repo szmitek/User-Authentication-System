@@ -1,28 +1,55 @@
 const express = require('express');
-const app = express()
+const app = express();
 const session = require('express-session');
+const dotenv = require('dotenv');
 
 const homeController = require('./controllers/homeController');
 const loginController = require('./controllers/loginController');
 const registerController = require('./controllers/registerController');
-const dashboardController = require('./controllers/dashboardController')
+const dashboardController = require('./controllers/dashboardController');
 
-app.set('view-engine', 'ejs')
-app.use(express.urlencoded({ extended: false }))
-// configure the express-session middleware
+// Load environment variables from the .env file
+dotenv.config();
+
+// Set the view engine to EJS
+app.set('view engine', 'ejs');
+
+// Use the express.urlencoded middleware to parse request bodies
+app.use(express.urlencoded({ extended: false }));
+
+// Configure the express-session middleware
 app.use(session({
-    secret: 'my-secret-key', // use a secret key to encrypt the session data
+    secret: process.env.SESSION_SECRET, // use a secret key from the .env file to encrypt the session data
     resave: false,
     saveUninitialized: false
 }));
 
-app.get('/', homeController.homePage)
-app.get('/dashboard', dashboardController.dashboardPage)
+// Use the express.static middleware to serve static files from the public directory
+app.use(express.static('public'));
 
-app.get('/login', loginController.loginPage)
-app.post('/login', loginController.loginUser)
+// Define routes
+app.route('/')
+    .get(homeController.homePage);
 
-app.get('/register', registerController.registerPage)
-app.post('/register', registerController.registerUser)
+app.route('/dashboard')
+    .get(dashboardController.dashboardPage);
 
-app.listen(3000)
+app.route('/login')
+    .get(loginController.loginPage)
+    .post(loginController.loginUser);
+
+app.route('/register')
+    .get(registerController.registerPage)
+    .post(registerController.registerUser);
+
+// Use error-handling middleware to handle errors that occur during the request-response cycle
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ error: 'Something went wrong!' });
+});
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
