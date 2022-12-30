@@ -4,7 +4,6 @@ const app = express()
 const homeController = require('./controllers/homeController');
 const loginController = require('./controllers/loginController');
 const registerController = require('./controllers/registerController');
-const users = []
 
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))

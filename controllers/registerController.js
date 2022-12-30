@@ -1,52 +1,50 @@
-const users = require("../server")
 const bcrypt = require('bcrypt')
-const crypto = require('crypto')
+const users = require('../data/users')
 
 exports.registerPage = (req, res) => {
     res.render('register.ejs')
 }
 
 exports.registerUser = async (req, res) => {
-    // Validate the user's input
-    if (!req.body.name || !req.body.email || !req.body.password || !req.body.confirm_password) {
-        // If any of the required fields are missing, return an error
-        return res.status(400).send({ error: 'Name, email, password, and confirm password are required' });
-    }
-    if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(req.body.email)) {
-        // If the email is not in a valid format, return an error
-        return res.status(400).send({ error: 'Invalid email' });
-    }
-    if (req.body.password !== req.body.confirm_password) {
-        // If the passwords don't match, return an error
-        return res.status(400).send({ error: 'Passwords do not match' });
-    }
-
-    // Check if a user with the same email already exists
-    const existingUser = users.find((user) => user.email === req.body.email);
-    if (existingUser) {
-        // If a user with the same email already exists, return an error
-        return res.status(400).send({ error: 'A user with this email already exists' });
-    }
-
     try {
-        // Generate a unique salt for the new user
-        const salt = crypto.randomBytes(16).toString('hex');
-        // Hash the user's password with the unique salt
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        // Add the new user to the in-memory array
-        users.push({
-            id: Date.now().toString(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword,
-            salt,
-            loginAttempts: 0,
-            lockUntil: 0,
-        });
-        // Redirect the user to the login page
-        res.redirect('/login');
+        // retrieve the name, email, password, and confirm password from the request body
+        const { name, email, password, confirm_password } = req.body;
+
+        // perform validation on the name, email, password, and confirm password
+        if (!name || !email || !password || !confirm_password) {
+            // one or more fields are empty, return an error response
+            console.log(name, email, password, confirm_password)
+            return res.status(400).send({ error: 'Name, email, password, and confirm password are required' });
+        }
+        if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email)) {
+            // email is not in a valid format, return an error response
+            return res.status(400).send({ error: 'Invalid email address' });
+        }
+        if (password.length < 8) {
+            // password is too short, return an error response
+            return res.status(400).send({ error: 'Password must be at least 8 characters long' });
+        }
+        if (password !== confirm_password) {
+            // passwords do not match, return an error response
+            return res.status(400).send({ error: 'Passwords do not match' });
+        }
+
+        // hash the password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // create a new user object using the name, email, and hashed password
+        const user = {
+            name,
+            email,
+            password: hashedPassword
+        };
+        // add the user to the users array
+        users.push(user);
+
+        // send a response to the client indicating that the registration was successful
+        res.send({ message: 'Registration successful' });
     } catch (error) {
-        // If there was an error saving the user, return an error
-        res.status(500).send({ error: 'Error saving user' });
+        // there was an error, send an error response to the client
+        res.status(500).send({ error: 'Error registering user' });
     }
 };
