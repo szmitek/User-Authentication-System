@@ -34,6 +34,9 @@ app.route('/')
 app.route('/dashboard')
     .get(dashboardController.dashboardPage);
 
+app.route('/logout')
+    .post(dashboardController.logout)
+
 app.route('/login')
     .get(loginController.loginPage)
     .post(loginController.loginUser);
