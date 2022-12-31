@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt')
-const users = require('../data/users')
 const mongoose = require('mongoose');
 const User = require('../models/user');
 
@@ -29,6 +28,13 @@ exports.registerUser = async (req, res) => {
         if (password !== confirm_password) {
             // passwords do not match, return an error response
             return res.status(400).send({ error: 'Passwords do not match' });
+        }
+
+        // check if a user with the same email already exists
+        const existingUser = await User.findOne({ email: email });
+        if (existingUser) {
+            // a user with the same email already exists, return an error response
+            return res.status(400).send({ error: 'Email already in use' });
         }
 
         // hash the password using bcrypt
