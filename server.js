@@ -2,11 +2,24 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 
 const homeController = require('./controllers/homeController');
 const loginController = require('./controllers/loginController');
 const registerController = require('./controllers/registerController');
 const dashboardController = require('./controllers/dashboardController');
+
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    console.log('Connected to MongoDB');
+});
 
 // Load environment variables from the .env file
 dotenv.config();
