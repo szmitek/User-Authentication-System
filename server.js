@@ -9,6 +9,10 @@ const loginController = require('./controllers/loginController');
 const registerController = require('./controllers/registerController');
 const dashboardController = require('./controllers/dashboardController');
 
+// Load environment variables from the .env file
+dotenv.config();
+
+console.log(process.env.MONGODB_URI)
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -20,9 +24,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     console.log('Connected to MongoDB');
 });
-
-// Load environment variables from the .env file
-dotenv.config();
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');

@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt')
 const users = require('../data/users')
+const mongoose = require('mongoose');
+const User = require('../models/user');
 
 exports.registerPage = (req, res) => {
     res.render('register.ejs')
@@ -33,13 +35,15 @@ exports.registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // create a new user object using the name, email, and hashed password
-        const user = {
+        const user = new User({
             name,
             email,
             password: hashedPassword
-        };
-        // add the user to the users array
-        users.push(user);
+        });
+
+        // save the user to the database
+        await user.save();
+
         // Redirect the user to the login page
         res.redirect('/login');
     } catch (error) {
