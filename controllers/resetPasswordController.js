@@ -1,6 +1,10 @@
 const crypto = require('crypto');
 const User = require('../models/user');
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+
+// Load environment variables from the .env file
+dotenv.config();
 
 // This function could be a standalone utility function or part of a larger
 // utility module for handling email functionality in your application
@@ -10,14 +14,14 @@ async function sendEmail(to, subject, body) {
         host: 'smtp.ethereal.email',
         port: 587,
         auth: {
-            user: 'nellie.wisoky@ethereal.email',
-            pass: 'VxTcMWZcCUh67C1C95'
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
         }
     });
 
     // send the email
     await transporter.sendMail({
-        from: 'nellie.wisoky@ethereal.emai',
+        from: process.env.EMAIL_USER,
         to,
         subject,
         html: body
@@ -47,7 +51,7 @@ exports.resetPassword = async (req, res) => {
         await user.save();
 
         // send an email to the user with a link to the reset password page
-        const resetPasswordUrl = `http://localhost:3000/resetPassword/${resetPasswordToken}`;
+        const resetPasswordUrl = `http://localhost:3000/updatePassword/${resetPasswordToken}`;
         await sendEmail(email, 'Reset Your Password', `Click here to reset your password: ${resetPasswordUrl}`);
 
         // redirect the user to the login page
