@@ -8,11 +8,13 @@ const homeController = require('./controllers/homeController');
 const loginController = require('./controllers/loginController');
 const registerController = require('./controllers/registerController');
 const dashboardController = require('./controllers/dashboardController');
+const resetPasswordController = require('./controllers/resetPasswordController');
+const updatePasswordController = require('./controllers/updatePasswordController');
 
 // Load environment variables from the .env file
 dotenv.config();
 
-console.log(process.env.MONGODB_URI)
+// Connect to the MongoDB database
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -50,6 +52,14 @@ app.route('/dashboard')
 
 app.route('/logout')
     .post(dashboardController.logout)
+
+app.route('/resetPassword')
+    .get(resetPasswordController.resetPasswordPage)
+    .post(resetPasswordController.resetPassword)
+
+app.route('/updatePassword')
+    .get(updatePasswordController.updatePasswordPage)
+    .post(updatePasswordController.updatePassword)
 
 app.route('/login')
     .get(loginController.loginPage)
