@@ -57,8 +57,10 @@ app.route('/resetPassword')
     .get(resetPasswordController.resetPasswordPage)
     .post(resetPasswordController.resetPassword)
 
-app.route('/updatePassword')
+app.route('/updatePassword/:token')
     .get(updatePasswordController.updatePasswordPage)
+
+app.route('/updatePassword')
     .post(updatePasswordController.updatePassword)
 
 app.route('/login')
